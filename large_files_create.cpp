@@ -27,16 +27,19 @@ static HANDLE createFile( const TCHAR* p_fn )
 }
 
 /* set file size to p_size bytes beyond current file pointer position */
-static void fileInflate( HANDLE p_file, DWORD p_size )
+static void fileInflate( HANDLE p_file, LONGLONG p_size )
 {
-	SetFilePointer( p_file, p_size, 0, FILE_CURRENT );
+	LARGE_INTEGER lisize;
+
+	lisize.QuadPart = p_size;
+	SetFilePointerEx( p_file, lisize, 0, FILE_CURRENT );
     SetEndOfFile( p_file );
 }
 
 int _tmain( int argc, _TCHAR* argv[] )
 {
 	HANDLE fd;
-	unsigned long long fsize;
+	ULONGLONG fsize;
 	TCHAR* end;
 	int apos;
 
@@ -83,7 +86,7 @@ int _tmain( int argc, _TCHAR* argv[] )
 			{
 				DPRINT( " file opened [%08X]", fd );
 
-				fileInflate( fd, fsize );
+				fileInflate( fd, ULONGLONG(fsize) );
 				DPRINT( " file inflated", fd );
 
 				CloseHandle( fd );
